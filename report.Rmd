@@ -1,17 +1,36 @@
-Title
+---
+title: "Reproducible Research: Peer Assessment 1"
+output: 
+  html_document:
+    keep_md: true
+---
+
+```{r global, , echo=FALSE}
+opts_chunk$set(echo = TRUE, cache = TRUE)
+```
+
+# Reproducible Research Assignment 2
 ========================================================
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring web pages (click the **Help** toolbar button for more details on using R Markdown).
+## *Thomas Antonakis*
 
-When you click the **Knit HTML** button a web page will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+### Title
 
-```{r}
-summary(cars)
-```
+Your document should have a title that briefly summarizes your data analysis
 
-You can also embed plots, for example:
 
-```{r fig.width=7, fig.height=6}
-plot(cars)
-```
+### Synopsis
 
+Immediately after the title, there should be a synopsis which describes and summarizes your analysis in at most 10 complete sentences.
+
+### Data Processing
+
+There should be a section titled Data Processing which describes (in words and code) how the data were loaded into R and processed for analysis. In particular, your analysis must start from the raw CSV file containing the data. You cannot do any preprocessing outside the document. If preprocessing is time-consuming you may consider using the cache = TRUE option for certain code chunks.
+
+### Results
+
+There should be a section titled Results in which your results are presented.
+
+The analysis document must have at least one figure containing a plot.
+
+Your analyis must have no more than three figures. Figures may have multiple plots in them (i.e. panel plots), but there cannot be more than three figures total.

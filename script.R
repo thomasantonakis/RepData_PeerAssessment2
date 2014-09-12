@@ -64,10 +64,9 @@ file_intermediate$CROPDMGEXP[!file_intermediate$CROPDMGEXP %in%
                                      c("", "K","M","B")]<-NA
 
 # Summarize new exponents
-table(file_intermediate$PROPDMGEXP, useNA="ifany",
-      exclude = c("-", "?","+", "h", "H", 0:9 ))
-table(file_intermediate$CROPDMGEXP, useNA="ifany",
-      exclude = c("-", "?","+", "h", "H", 0:9 ))
+table(file_intermediate$PROPDMGEXP, useNA="ifany")
+table(file_intermediate$CROPDMGEXP, useNA="ifany")
+
 
 # Store money related variables to a separate dataframe.
 economic<-data.frame("EVTYPE" = file_intermediate$EVTYPE, 
@@ -83,8 +82,8 @@ names(economic)<-tolower(names(economic))
 rm(file_intermediate)
 
 # Calculate share of missing values
-good<- complete.cases(economic$propdmgexp, economic$cropdmgexp)
-abs(length(good)/nrow(economic)-1)*100
+good<- complete.cases(economic$propdmgexp,economic$cropdmgexp)
+round(abs(sum(good)/nrow(economic)-1)*100, 2)
 
 # Take Missing values out of economic dataframe
 economic<-economic[good,]
