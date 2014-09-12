@@ -47,7 +47,12 @@ health<-data.frame("EVTYPE" = file_intermediate$EVTYPE,
 names(health)<-tolower(names(health))
 
 # Calculate a health damage index using the fatalities and injuries variables
+# We assume that one fatality weighs as much as 10 injuries in terms of health damage
+health$damage <- health$injuries + 10 * health$fatalities
 
+library(plyr)
+tom<-ddply(.data=health, .variables=.(evtype) , summarize, sum = sum(damage))
+head(tom)
 
 # Explore the variables connected to monetary damages.
 table(file_intermediate$PROPDMGEXP, useNA="ifany")
@@ -99,3 +104,9 @@ summary(economic)
 # First the exponents must be transformed to multipliers
 
 
+# Suppose that property damage of one dollar weighs exactly as a crop damage of 
+# one dollar in the economical damage, then the economic damage index is just 
+# the sum of the crops and property product of exponents and dollar figures.
+
+economic$damage <- economic$propdmg * economic$propdmgexp + 
+        economic$cropdmg * economic$cropdmgexp
