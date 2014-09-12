@@ -2,15 +2,19 @@
 if(!file.exists("./data")){dir.create("./data")}
 
 # Download the file, and keep the date. SOS CACHE
+if(!file.exists("./data/storm_data.csv.bz2")){
 fileurl<-"https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2FStormData.csv.bz2"
 download.file(fileurl, destfile="./data/storm_data.csv.bz2", method="auto")
 dateDownloaded<-date()
+}
 
 # "Unzip file" to a variable
 filename <- bzfile("./data/storm_data.csv.bz2")
 
 # Load file in a dataframe. SOS CACHE
+if (!exists("storm")){
 storm<-read.csv(filename, stringsAsFactors = FALSE)
+}
 
 # Check the file out
 dim(storm)
