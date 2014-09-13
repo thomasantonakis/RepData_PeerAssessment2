@@ -11,7 +11,7 @@ dateDownloaded<-date()
 # "Unzip file" to a variable
 filename <- bzfile("./data/storm_data.csv.bz2")
 
-# Load file in a dataframe. SOS CACHE
+# Load file in a dataframe. 
 # We do not need all variables. After checking the documentation we keep the following
 if (!exists("storm")){
 storm<-read.csv(filename, stringsAsFactors = FALSE, 

@@ -215,6 +215,24 @@ dateDownloaded&lt;-date()
 
 <p>The file is now downloaded to a local folder. We now will unzip it and load it into a dataset in the R environment.  </p>
 
+<pre><code class="r"># &quot;Unzip file&quot; to a variable
+filename &lt;- bzfile(&quot;./data/storm_data.csv.bz2&quot;)
+
+# Load file in a dataframe. 
+# We do not need all variables. After checking the documentation we keep the following
+if (!exists(&quot;storm&quot;)){
+storm&lt;-read.csv(filename, stringsAsFactors = FALSE, 
+                colClasses=c(&quot;NULL&quot;, NA   ,&quot;NULL&quot;,&quot;NULL&quot;,&quot;NULL&quot;,
+                             &quot;NULL&quot;,&quot;NULL&quot;, NA   ,&quot;NULL&quot;,&quot;NULL&quot;,
+                             &quot;NULL&quot;,&quot;NULL&quot;,&quot;NULL&quot;,&quot;NULL&quot;,&quot;NULL&quot;,
+                             &quot;NULL&quot;,&quot;NULL&quot;,&quot;NULL&quot;,&quot;NULL&quot;,&quot;NULL&quot;,
+                             &quot;NULL&quot;,&quot;NULL&quot;,NA,NA,NA,
+                             NA,NA,NA,&quot;NULL&quot;,&quot;NULL&quot;,
+                             &quot;NULL&quot;,&quot;NULL&quot;,&quot;NULL&quot;,&quot;NULL&quot;,&quot;NULL&quot;,
+                             &quot;NULL&quot;,&quot;NULL&quot;))
+}
+</code></pre>
+
 <p>This may take a couple of minutes depending on the sustem, as the csv is 47Mb big compressed and uncompressed is much much more than that: 548Mb.<br/>
 So, hopefully, after the csv has been loaded in a dataframe named <code>storm</code> , we can check it out a little bit</p>
 
@@ -222,19 +240,40 @@ So, hopefully, after the csv has been loaded in a dataframe named <code>storm</c
 dim(storm)
 </code></pre>
 
-<pre><code>## Error: object &#39;storm&#39; not found
+<pre><code>## [1] 902297      8
 </code></pre>
 
 <pre><code class="r">str(storm)
 </code></pre>
 
-<pre><code>## Error: object &#39;storm&#39; not found
+<pre><code>## &#39;data.frame&#39;:    902297 obs. of  8 variables:
+##  $ BGN_DATE  : chr  &quot;4/18/1950 0:00:00&quot; &quot;4/18/1950 0:00:00&quot; &quot;2/20/1951 0:00:00&quot; &quot;6/8/1951 0:00:00&quot; ...
+##  $ EVTYPE    : chr  &quot;TORNADO&quot; &quot;TORNADO&quot; &quot;TORNADO&quot; &quot;TORNADO&quot; ...
+##  $ FATALITIES: num  0 0 0 0 0 0 0 0 1 0 ...
+##  $ INJURIES  : num  15 0 2 2 2 6 1 0 14 0 ...
+##  $ PROPDMG   : num  25 2.5 25 2.5 2.5 2.5 2.5 2.5 25 25 ...
+##  $ PROPDMGEXP: chr  &quot;K&quot; &quot;K&quot; &quot;K&quot; &quot;K&quot; ...
+##  $ CROPDMG   : num  0 0 0 0 0 0 0 0 0 0 ...
+##  $ CROPDMGEXP: chr  &quot;&quot; &quot;&quot; &quot;&quot; &quot;&quot; ...
 </code></pre>
 
 <pre><code class="r">summary(storm)
 </code></pre>
 
-<pre><code>## Error: object &#39;storm&#39; not found
+<pre><code>##    BGN_DATE            EVTYPE            FATALITIES     INJURIES     
+##  Length:902297      Length:902297      Min.   :  0   Min.   :   0.0  
+##  Class :character   Class :character   1st Qu.:  0   1st Qu.:   0.0  
+##  Mode  :character   Mode  :character   Median :  0   Median :   0.0  
+##                                        Mean   :  0   Mean   :   0.2  
+##                                        3rd Qu.:  0   3rd Qu.:   0.0  
+##                                        Max.   :583   Max.   :1700.0  
+##     PROPDMG      PROPDMGEXP           CROPDMG       CROPDMGEXP       
+##  Min.   :   0   Length:902297      Min.   :  0.0   Length:902297     
+##  1st Qu.:   0   Class :character   1st Qu.:  0.0   Class :character  
+##  Median :   0   Mode  :character   Median :  0.0   Mode  :character  
+##  Mean   :  12                      Mean   :  1.5                     
+##  3rd Qu.:   0                      3rd Qu.:  0.0                     
+##  Max.   :5000                      Max.   :990.0
 </code></pre>
 
 <h3>Results</h3>

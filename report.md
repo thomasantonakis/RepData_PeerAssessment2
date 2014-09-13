@@ -45,6 +45,79 @@ dateDownloaded<-date()
 The file is now downloaded to a local folder. We now will unzip it and load it into a dataset in the R environment.  
 
 
+```r
+# "Unzip file" to a variable
+filename <- bzfile("./data/storm_data.csv.bz2")
+
+# Load file in a dataframe. 
+# We do not need all variables. After checking the documentation we keep the following
+if (!exists("storm")){
+storm<-read.csv(filename, stringsAsFactors = FALSE, 
+                colClasses=c("NULL", NA   ,"NULL","NULL","NULL",
+                             "NULL","NULL", NA   ,"NULL","NULL",
+                             "NULL","NULL","NULL","NULL","NULL",
+                             "NULL","NULL","NULL","NULL","NULL",
+                             "NULL","NULL",NA,NA,NA,
+                             NA,NA,NA,"NULL","NULL",
+                             "NULL","NULL","NULL","NULL","NULL",
+                             "NULL","NULL"))
+}
+```
+
+This may take a couple of minutes depending on the sustem, as the csv is 47Mb big compressed and uncompressed is much much more than that: 548Mb.  
+So, hopefully, after the csv has been loaded in a dataframe named `storm` , we can check it out a little bit
 
 
+```r
+# Check the file out
+dim(storm)
+```
 
+```
+## [1] 902297      8
+```
+
+```r
+str(storm)
+```
+
+```
+## 'data.frame':	902297 obs. of  8 variables:
+##  $ BGN_DATE  : chr  "4/18/1950 0:00:00" "4/18/1950 0:00:00" "2/20/1951 0:00:00" "6/8/1951 0:00:00" ...
+##  $ EVTYPE    : chr  "TORNADO" "TORNADO" "TORNADO" "TORNADO" ...
+##  $ FATALITIES: num  0 0 0 0 0 0 0 0 1 0 ...
+##  $ INJURIES  : num  15 0 2 2 2 6 1 0 14 0 ...
+##  $ PROPDMG   : num  25 2.5 25 2.5 2.5 2.5 2.5 2.5 25 25 ...
+##  $ PROPDMGEXP: chr  "K" "K" "K" "K" ...
+##  $ CROPDMG   : num  0 0 0 0 0 0 0 0 0 0 ...
+##  $ CROPDMGEXP: chr  "" "" "" "" ...
+```
+
+```r
+summary(storm)
+```
+
+```
+##    BGN_DATE            EVTYPE            FATALITIES     INJURIES     
+##  Length:902297      Length:902297      Min.   :  0   Min.   :   0.0  
+##  Class :character   Class :character   1st Qu.:  0   1st Qu.:   0.0  
+##  Mode  :character   Mode  :character   Median :  0   Median :   0.0  
+##                                        Mean   :  0   Mean   :   0.2  
+##                                        3rd Qu.:  0   3rd Qu.:   0.0  
+##                                        Max.   :583   Max.   :1700.0  
+##     PROPDMG      PROPDMGEXP           CROPDMG       CROPDMGEXP       
+##  Min.   :   0   Length:902297      Min.   :  0.0   Length:902297     
+##  1st Qu.:   0   Class :character   1st Qu.:  0.0   Class :character  
+##  Median :   0   Mode  :character   Median :  0.0   Mode  :character  
+##  Mean   :  12                      Mean   :  1.5                     
+##  3rd Qu.:   0                      3rd Qu.:  0.0                     
+##  Max.   :5000                      Max.   :990.0
+```
+
+### Results
+
+There should be a section titled Results in which your results are presented.
+
+The analysis document must have at least one figure containing a plot.
+
+Your analyis must have no more than three figures. Figures may have multiple plots in them (i.e. panel plots), but there cannot be more than three figures total.

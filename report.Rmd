@@ -6,7 +6,7 @@ output:
 ---
 
 ```{r global, , echo=FALSE}
-opts_chunk$set(echo = TRUE)
+opts_chunk$set(echo = TRUE, cache = TRUE)
 ```
 
 # Reproducible Research Assignment 2
@@ -46,18 +46,28 @@ dateDownloaded<-date()
 The file is now downloaded to a local folder. We now will unzip it and load it into a dataset in the R environment.  
 
 ```{r unzip and load storm data}
+# "Unzip file" to a variable
 filename <- bzfile("./data/storm_data.csv.bz2")
 
 # Load file in a dataframe. 
+# We do not need all variables. After checking the documentation we keep the following
 if (!exists("storm")){
-storm<-read.csv(filename, stringsAsFactors = FALSE)
+storm<-read.csv(filename, stringsAsFactors = FALSE, 
+                colClasses=c("NULL", NA   ,"NULL","NULL","NULL",
+                             "NULL","NULL", NA   ,"NULL","NULL",
+                             "NULL","NULL","NULL","NULL","NULL",
+                             "NULL","NULL","NULL","NULL","NULL",
+                             "NULL","NULL",NA,NA,NA,
+                             NA,NA,NA,"NULL","NULL",
+                             "NULL","NULL","NULL","NULL","NULL",
+                             "NULL","NULL"))
 }
 ```  
 
 This may take a couple of minutes depending on the sustem, as the csv is 47Mb big compressed and uncompressed is much much more than that: 548Mb.  
 So, hopefully, after the csv has been loaded in a dataframe named `storm` , we can check it out a little bit
 
-```{r basic exploration of the storm file}
+```{r basic exploration of the storm file, cache=FALSE}
 # Check the file out
 dim(storm)
 str(storm)
