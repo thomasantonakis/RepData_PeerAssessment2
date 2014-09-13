@@ -215,6 +215,8 @@ dateDownloaded&lt;-date()
 
 <p>The file is now downloaded to a local folder. We now will unzip it and load it into a dataset in the R environment.  </p>
 
+<p><em>Loading the whole dataset in R, caused knitr to stop its executionand not showing anything from this point down in the report. The loading was done in R studio , some exploration was performed and below we will only load / read the variables that seem to be related with the questions of the assignment.</em>  </p>
+
 <pre><code class="r"># &quot;Unzip file&quot; to a variable
 filename &lt;- bzfile(&quot;./data/storm_data.csv.bz2&quot;)
 

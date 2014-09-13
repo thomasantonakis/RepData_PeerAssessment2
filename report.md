@@ -44,6 +44,8 @@ dateDownloaded<-date()
 
 The file is now downloaded to a local folder. We now will unzip it and load it into a dataset in the R environment.  
 
+*Loading the whole dataset in R, caused knitr to stop its executionand not showing anything from this point down in the report. The loading was done in R studio , some exploration was performed and below we will only load / read the variables that seem to be related with the questions of the assignment.*  
+
 
 ```r
 # "Unzip file" to a variable
