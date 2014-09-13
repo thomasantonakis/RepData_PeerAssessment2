@@ -5,9 +5,7 @@ output:
     keep_md: true
 ---
 
-```{r global, , echo=FALSE}
-opts_chunk$set(echo = TRUE, cache = TRUE)
-```
+
 
 # Reproducible Research Assignment 2
 ========================================================
@@ -31,7 +29,8 @@ This project involves exploring the U.S. National Oceanic and Atmospheric Admini
 The events in the database start in the year 1950 and end in November 2011. In the earlier years of the database there are generally fewer events recorded, most likely due to lack of good records. More recent years should be considered more complete.  
 The data for the  analysis cme in form of a comma-separated-value file compressed via the bzip2 algorithm to reduce its size.  
 Let's first of all download the file.  
-``` {r download the bz2 file, cache=TRUE}
+
+```r
 # Create folder to put download the file
 if(!file.exists("./data")){dir.create("./data")}
 
@@ -41,22 +40,39 @@ fileurl<-"https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2FStormData.csv.b
 download.file(fileurl, destfile="./data/storm_data.csv.bz2", method="auto")
 dateDownloaded<-date()
 }
-```  
+```
 
 The file is now downloaded to a local folder. We now will unzip it and load it into a dataset in the R environment.  
 
-```{r unzip and load storm data, , cache = TRUE}
 
-```  
 
 This may take a couple of minutes depending on the sustem, as the csv is 47Mb big compressed and uncompressed is much much more than that: 548Mb.  
 So, hopefully, after the csv has been loaded in a dataframe named `storm` , we can check it out a little bit
 
-```{r basic exploration of the storm file}
+
+```r
 # Check the file out
 dim(storm)
+```
+
+```
+## Error: object 'storm' not found
+```
+
+```r
 str(storm)
+```
+
+```
+## Error: object 'storm' not found
+```
+
+```r
 summary(storm)
+```
+
+```
+## Error: object 'storm' not found
 ```
 
 ### Results
