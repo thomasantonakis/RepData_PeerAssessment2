@@ -61,10 +61,6 @@ rm(storm)
 str(file_intermediate)
 summary(file_intermediate)
 
-# Try to clean the ENVTYPE file.
-# levels(file_intermediate$EVTYPE)
-
-
 #Check the variables connected to population health effects
 sum(file_intermediate$FATALITIES)
 sum(file_intermediate$INJURIES)

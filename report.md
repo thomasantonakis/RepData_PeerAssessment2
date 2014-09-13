@@ -179,6 +179,171 @@ file_intermediate<-data.frame("EVTYPE" = storm$EVTYPE, "FATALITIES" = storm$FATA
 rm(storm)
 ```
 
+Let us take another look at the summary and structure of the intermediate file:
+
+
+```r
+# Check the intermediate file out
+str(file_intermediate)
+```
+
+```
+## 'data.frame':	826931 obs. of  7 variables:
+##  $ EVTYPE    : Factor w/ 985 levels "   HIGH SURF ADVISORY",..: 244 244 244 244 244 244 856 856 856 834 ...
+##  $ FATALITIES: num  0 0 0 0 0 0 0 0 0 0 ...
+##  $ INJURIES  : num  0 0 0 0 0 0 0 0 0 0 ...
+##  $ PROPDMG   : num  0 0 0 0 0 0 0 0 0 2.5 ...
+##  $ PROPDMGEXP: Factor w/ 19 levels "","-","?","+",..: 1 1 1 1 1 1 1 1 1 17 ...
+##  $ CROPDMG   : num  0 0 0 0 0 0 0 0 0 0 ...
+##  $ CROPDMGEXP: Factor w/ 9 levels "","?","0","2",..: 1 1 1 1 1 1 1 1 1 1 ...
+```
+
+```r
+summary(file_intermediate)
+```
+
+```
+##                EVTYPE         FATALITIES     INJURIES         PROPDMG    
+##  HAIL             :267518   Min.   :  0   Min.   :   0.0   Min.   :   0  
+##  TSTM WIND        :187596   1st Qu.:  0   1st Qu.:   0.0   1st Qu.:   0  
+##  THUNDERSTORM WIND: 82563   Median :  0   Median :   0.0   Median :   0  
+##  FLASH FLOOD      : 54277   Mean   :  0   Mean   :   0.1   Mean   :  12  
+##  TORNADO          : 38773   3rd Qu.:  0   3rd Qu.:   0.0   3rd Qu.:   1  
+##  FLOOD            : 25326   Max.   :583   Max.   :1568.0   Max.   :5000  
+##  (Other)          :170878                                                
+##    PROPDMGEXP        CROPDMG        CROPDMGEXP    
+##         :412447   Min.   :  0.0          :543047  
+##  K      :404025   1st Qu.:  0.0   K      :281832  
+##  M      : 10091   Median :  0.0   M      :  1994  
+##  0      :   216   Mean   :  1.7   k      :    21  
+##  B      :    40   3rd Qu.:  0.0   0      :    19  
+##  5      :    28   Max.   :990.0   B      :     9  
+##  (Other):    84                   (Other):     9
+```
+
+We will first tackle the analysis on health effects of the storms. So, we will check the sums of the injuries and the fatalities of storms recorded after 1980.  
+
+
+```r
+#Check the variables connected to population health effects
+sum(file_intermediate$FATALITIES)
+```
+
+```
+## [1] 11786
+```
+
+```r
+sum(file_intermediate$INJURIES)
+```
+
+```
+## [1] 87153
+```
+
+There have been 1.1786 &times; 10<sup>4</sup>deaths and 8.7153 &times; 10<sup>4</sup>  injuries from storm events from 1980 onwards.   
+
+Let us take a subset of the intermediate file using only the event types and the variables of injuries and fatalities.
+
+
+```r
+# Store health related variables to a separate dataframe.
+health<-data.frame("EVTYPE" = file_intermediate$EVTYPE, 
+                   "FATALITIES" = file_intermediate$FATALITIES,
+                   "INJURIES" = file_intermediate$INJURIES)
+
+# "Clean" data frame names
+names(health)<-tolower(names(health))
+```
+
+We need to discuss a bit the comparison of an injury and a fatality on the effect they have on population health. We can all understand that  a minor scratch might be recorded as an injury, as a paralysis can also be cosidered as an injury too, but a fatality means a lot more than that, but it is more specific.  
+In order to point that difference out we will multiply the effect of a fatality so that a fatality is considered 10 times more harmful as an innjury record, and we could even be quite underestimating the comparison.  
+So an index of health effect will be created in order to combine the fatalities and the injuries data. 
+
+
+```r
+# Calculate a health damage index using the fatalities and injuries variables
+# We assume that one fatality weighs as much as 10 injuries in terms of health damage
+health$damage <- health$injuries + 10 * health$fatalities
+```
+
+We now have to aggregate the effect on the event types, so as to find out which types are the more harmful for the population health, across the United States.
+
+We will simply add all the figures in the index to see the total damage caused, and simultaneously, we will try the same things but with averages, so as to calculate an effect per event.
+
+
+```r
+# Calculate sum of damages and average damage per evtype
+library(plyr)
+health_sum<-ddply(.data=health, .variables=.(evtype) , summarize, sum = sum(damage))
+health_ave<-ddply(.data=health, .variables=.(evtype) , summarize, sum = mean(damage))
+names(health_sum) [2]<- c("sum_damage")
+names(health_ave) [2]<- c("avg_damage")
+health_agg<-arrange(join(health_sum, health_ave), evtype)
+```
+
+```
+## Joining by: evtype
+```
+
+```r
+a<-head(arrange(health_agg, sum_damage, decreasing = TRUE), 10)
+a
+```
+
+```
+##            evtype sum_damage avg_damage
+## 1         TORNADO      60711    1.56581
+## 2  EXCESSIVE HEAT      25555   15.22944
+## 3       LIGHTNING      13390    0.84994
+## 4       TSTM WIND      11997    0.06395
+## 5     FLASH FLOOD      11557    0.21293
+## 6           FLOOD      11489    0.45364
+## 7            HEAT      11470   14.95437
+## 8     RIP CURRENT       3912    8.32340
+## 9       HIGH WIND       3617    0.17895
+## 10   WINTER STORM       3381    0.29572
+```
+
+```r
+head(arrange(health_agg, avg_damage, decreasing = TRUE), 10)
+```
+
+```
+##                        evtype sum_damage avg_damage
+## 1  TORNADOES, TSTM WIND, HAIL        250     250.00
+## 2               COLD AND SNOW        140     140.00
+## 3       TROPICAL STORM GORDON        123     123.00
+## 4                   Heat Wave         70      70.00
+## 5       RECORD/EXCESSIVE HEAT        170      56.67
+## 6           HEAT WAVE DROUGHT         55      55.00
+## 7                EXTREME HEAT       1115      50.68
+## 8          HIGH WIND AND SEAS         50      50.00
+## 9                  WILD FIRES        180      45.00
+## 10             HIGH WIND/SEAS         40      40.00
+```
+
+It turns out that the average version did not work as expected as the mean equals the sum , so these types of storm events have occured too few times.
+
+So, using the total effect we shhow in the following plot which tyes of storms have had the greates effects on population health.  
+
+
+```r
+# Sum will be used
+# Make a plot to illustrate greatest threats
+aplot <- a$sum_damage
+names(aplot) <- a$evtype
+par(mar = c(4, 10, 4, 1))
+barplot(aplot, col= 2, main="Top types of events in \n total health Damage index", 
+        horiz=TRUE, las=1)
+```
+
+![plot of chunk barplot health](figure/barplot health.png) 
+
+```r
+# Release memory
+rm(health_sum,health_ave)
+```
 
 ### Results
 

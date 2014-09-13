@@ -332,6 +332,148 @@ file_intermediate&lt;-data.frame(&quot;EVTYPE&quot; = storm$EVTYPE, &quot;FATALI
 rm(storm)
 </code></pre>
 
+<p>Let us take another look at the summary and structure of the intermediate file:</p>
+
+<pre><code class="r"># Check the intermediate file out
+str(file_intermediate)
+</code></pre>
+
+<pre><code>## &#39;data.frame&#39;:    826931 obs. of  7 variables:
+##  $ EVTYPE    : Factor w/ 985 levels &quot;   HIGH SURF ADVISORY&quot;,..: 244 244 244 244 244 244 856 856 856 834 ...
+##  $ FATALITIES: num  0 0 0 0 0 0 0 0 0 0 ...
+##  $ INJURIES  : num  0 0 0 0 0 0 0 0 0 0 ...
+##  $ PROPDMG   : num  0 0 0 0 0 0 0 0 0 2.5 ...
+##  $ PROPDMGEXP: Factor w/ 19 levels &quot;&quot;,&quot;-&quot;,&quot;?&quot;,&quot;+&quot;,..: 1 1 1 1 1 1 1 1 1 17 ...
+##  $ CROPDMG   : num  0 0 0 0 0 0 0 0 0 0 ...
+##  $ CROPDMGEXP: Factor w/ 9 levels &quot;&quot;,&quot;?&quot;,&quot;0&quot;,&quot;2&quot;,..: 1 1 1 1 1 1 1 1 1 1 ...
+</code></pre>
+
+<pre><code class="r">summary(file_intermediate)
+</code></pre>
+
+<pre><code>##                EVTYPE         FATALITIES     INJURIES         PROPDMG    
+##  HAIL             :267518   Min.   :  0   Min.   :   0.0   Min.   :   0  
+##  TSTM WIND        :187596   1st Qu.:  0   1st Qu.:   0.0   1st Qu.:   0  
+##  THUNDERSTORM WIND: 82563   Median :  0   Median :   0.0   Median :   0  
+##  FLASH FLOOD      : 54277   Mean   :  0   Mean   :   0.1   Mean   :  12  
+##  TORNADO          : 38773   3rd Qu.:  0   3rd Qu.:   0.0   3rd Qu.:   1  
+##  FLOOD            : 25326   Max.   :583   Max.   :1568.0   Max.   :5000  
+##  (Other)          :170878                                                
+##    PROPDMGEXP        CROPDMG        CROPDMGEXP    
+##         :412447   Min.   :  0.0          :543047  
+##  K      :404025   1st Qu.:  0.0   K      :281832  
+##  M      : 10091   Median :  0.0   M      :  1994  
+##  0      :   216   Mean   :  1.7   k      :    21  
+##  B      :    40   3rd Qu.:  0.0   0      :    19  
+##  5      :    28   Max.   :990.0   B      :     9  
+##  (Other):    84                   (Other):     9
+</code></pre>
+
+<p>We will first tackle the analysis on health effects of the storms. So, we will check the sums of the injuries and the fatalities of storms recorded after 1980.  </p>
+
+<pre><code class="r">#Check the variables connected to population health effects
+sum(file_intermediate$FATALITIES)
+</code></pre>
+
+<pre><code>## [1] 11786
+</code></pre>
+
+<pre><code class="r">sum(file_intermediate$INJURIES)
+</code></pre>
+
+<pre><code>## [1] 87153
+</code></pre>
+
+<p>There have been 1.1786 &times; 10<sup>4</sup>deaths and 8.7153 &times; 10<sup>4</sup>  injuries from storm events from 1980 onwards.   </p>
+
+<p>Let us take a subset of the intermediate file using only the event types and the variables of injuries and fatalities.</p>
+
+<pre><code class="r"># Store health related variables to a separate dataframe.
+health&lt;-data.frame(&quot;EVTYPE&quot; = file_intermediate$EVTYPE, 
+                   &quot;FATALITIES&quot; = file_intermediate$FATALITIES,
+                   &quot;INJURIES&quot; = file_intermediate$INJURIES)
+
+# &quot;Clean&quot; data frame names
+names(health)&lt;-tolower(names(health))
+</code></pre>
+
+<p>We need to discuss a bit the comparison of an injury and a fatality on the effect they have on population health. We can all understand that  a minor scratch might be recorded as an injury, as a paralysis can also be cosidered as an injury too, but a fatality means a lot more than that, but it is more specific.<br/>
+In order to point that difference out we will multiply the effect of a fatality so that a fatality is considered 10 times more harmful as an innjury record, and we could even be quite underestimating the comparison.<br/>
+So an index of health effect will be created in order to combine the fatalities and the injuries data. </p>
+
+<pre><code class="r"># Calculate a health damage index using the fatalities and injuries variables
+# We assume that one fatality weighs as much as 10 injuries in terms of health damage
+health$damage &lt;- health$injuries + 10 * health$fatalities
+</code></pre>
+
+<p>We now have to aggregate the effect on the event types, so as to find out which types are the more harmful for the population health, across the United States.</p>
+
+<p>We will simply add all the figures in the index to see the total damage caused, and simultaneously, we will try the same things but with averages, so as to calculate an effect per event.</p>
+
+<pre><code class="r"># Calculate sum of damages and average damage per evtype
+library(plyr)
+health_sum&lt;-ddply(.data=health, .variables=.(evtype) , summarize, sum = sum(damage))
+health_ave&lt;-ddply(.data=health, .variables=.(evtype) , summarize, sum = mean(damage))
+names(health_sum) [2]&lt;- c(&quot;sum_damage&quot;)
+names(health_ave) [2]&lt;- c(&quot;avg_damage&quot;)
+health_agg&lt;-arrange(join(health_sum, health_ave), evtype)
+</code></pre>
+
+<pre><code>## Joining by: evtype
+</code></pre>
+
+<pre><code class="r">a&lt;-head(arrange(health_agg, sum_damage, decreasing = TRUE), 10)
+a
+</code></pre>
+
+<pre><code>##            evtype sum_damage avg_damage
+## 1         TORNADO      60711    1.56581
+## 2  EXCESSIVE HEAT      25555   15.22944
+## 3       LIGHTNING      13390    0.84994
+## 4       TSTM WIND      11997    0.06395
+## 5     FLASH FLOOD      11557    0.21293
+## 6           FLOOD      11489    0.45364
+## 7            HEAT      11470   14.95437
+## 8     RIP CURRENT       3912    8.32340
+## 9       HIGH WIND       3617    0.17895
+## 10   WINTER STORM       3381    0.29572
+</code></pre>
+
+<pre><code class="r">head(arrange(health_agg, avg_damage, decreasing = TRUE), 10)
+</code></pre>
+
+<pre><code>##                        evtype sum_damage avg_damage
+## 1  TORNADOES, TSTM WIND, HAIL        250     250.00
+## 2               COLD AND SNOW        140     140.00
+## 3       TROPICAL STORM GORDON        123     123.00
+## 4                   Heat Wave         70      70.00
+## 5       RECORD/EXCESSIVE HEAT        170      56.67
+## 6           HEAT WAVE DROUGHT         55      55.00
+## 7                EXTREME HEAT       1115      50.68
+## 8          HIGH WIND AND SEAS         50      50.00
+## 9                  WILD FIRES        180      45.00
+## 10             HIGH WIND/SEAS         40      40.00
+</code></pre>
+
+<p>It turns out that the average version did not work as expected as the mean equals the sum , so these types of storm events have occured too few times.</p>
+
+<p>So, using the total effect we shhow in the following plot which tyes of storms have had the greates effects on population health.  </p>
+
+<pre><code class="r"># Sum will be used
+# Make a plot to illustrate greatest threats
+aplot &lt;- a$sum_damage
+names(aplot) &lt;- a$evtype
+par(mar = c(4, 10, 4, 1))
+barplot(aplot, col= 2, main=&quot;Top types of events in \n total health Damage index&quot;, 
+        horiz=TRUE, las=1)
+</code></pre>
+
+<p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAfgAAAH4CAMAAACR9g9NAAAArlBMVEX9/v0AAAAAADkAAGUAOTkAOY8AZo8AZrU5AAA5ADk5AGU5OWU5OY85Zo85ZrU5j485j9plAABlADllAGVlOQBlOTllOY9lZjllZmVlZrVltbVltdpltf2POQCPOTmPOWWPZgCPZo+Pj2WPtY+P27WP29qP2/21ZgC1Zjm1tWW124+1/rW1/tq1/v3ajznaj2Xa24/a/rXa/tra/v39tWX924/9/rX9/tr9/v3/AACg+SLsAAAAOnRSTlP//////////////////////////////////////////////////////////////////////////wD/iebt9QAAAAlwSFlzAAALEgAACxIB0t1+/AAAE1pJREFUeJztnQt72kYaRotdF+K6WZFs3HQL9rbuQpINahMkpP3/f2znrhESF4E0muZ9z5NaYjQjKIe5Cc3HdyWB5LuxXwAZB4oHheJBoXhQKB4UigeF4kGheFAoHhSKB4XiQaF4UCgeFIoHheJBgRJfLCeK6YHj60XXM+azyc3q7Nx759/Nbzddn7A3KL5iPeksvlORC84/HFDiS1lF77Zikwr9ifwk3H6cTHS9U5+KH5biQTZJvAMy60KVtDldeVVEnc9lW6tPlfprUuypVOapfxpZ4/1XEBRM8WtT8U0ToNxpMalwtb5ZVQd01kRYmlSWTXlPvM2Wyce7uWj/bYo5lc489U+jxR/tfIYDUnw+E2KkHfG2K6W6CZZNcT4ThpQPfUDllymmqTAnMeVd6+2yFUuRKu17KfbzoM9fncaIN0cDAyk+UzVMVG4pRu4k6pgUUyzvvsynpTuQ6VHBzUpVVdMku/JOvMumTiZTXYr6KOzmRrx/Gi3eHg0MxdfFl+nNyyxpEa86ZzOEPyZeSPwyVwMFJ148cuL905g+fkPxATjV1JsJWr2pdxjPB5p6k+fmd/lBcil74r3TUHxADg/uVKpKUp1zfXAn++xJ1Ujb8r5LeyI7tbcpvvjJ1D8NxQekbTpn33UhRemZ1g6sK6HVxRpT3puaryfVAH/qp1Rq1fm901D8aOiuvE5qJt/jXVQLAsW3JlH8t03Tb6ov01E8+UaheFAoHhSKBwVDfP0OCO+RvRfi8GBO51gv6ln0l2yXfb/evP+C8/iB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" alt="plot of chunk barplot health"/> </p>
+
+<pre><code class="r"># Release memory
+rm(health_sum,health_ave)
+</code></pre>
+
 <h3>Results</h3>
 
 <p>There should be a section titled Results in which your results are presented.</p>
