@@ -1,12 +1,12 @@
 ---
-title: "Reproducible Research: Peer Assessment 1"
+title: "Reproducible Research: Peer Assessment 2"
 output: 
   html_document:
     keep_md: true
 ---
 
 ```{r global, , echo=FALSE}
-opts_chunk$set(echo = TRUE, cache = TRUE)
+opts_chunk$set(echo = TRUE)
 ```
 
 # Reproducible Research Assignment 2
@@ -45,8 +45,13 @@ dateDownloaded<-date()
 
 The file is now downloaded to a local folder. We now will unzip it and load it into a dataset in the R environment.  
 
-```{r unzip and load storm data, , cache = TRUE}
+```{r unzip and load storm data}
+filename <- bzfile("./data/storm_data.csv.bz2")
 
+# Load file in a dataframe. 
+if (!exists("storm")){
+storm<-read.csv(filename, stringsAsFactors = FALSE)
+}
 ```  
 
 This may take a couple of minutes depending on the sustem, as the csv is 47Mb big compressed and uncompressed is much much more than that: 548Mb.  

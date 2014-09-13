@@ -1,5 +1,5 @@
 ---
-title: "Reproducible Research: Peer Assessment 1"
+title: "Reproducible Research: Peer Assessment 2"
 output: 
   html_document:
     keep_md: true
@@ -46,39 +46,5 @@ The file is now downloaded to a local folder. We now will unzip it and load it i
 
 
 
-This may take a couple of minutes depending on the sustem, as the csv is 47Mb big compressed and uncompressed is much much more than that: 548Mb.  
-So, hopefully, after the csv has been loaded in a dataframe named `storm` , we can check it out a little bit
 
 
-```r
-# Check the file out
-dim(storm)
-```
-
-```
-## Error: object 'storm' not found
-```
-
-```r
-str(storm)
-```
-
-```
-## Error: object 'storm' not found
-```
-
-```r
-summary(storm)
-```
-
-```
-## Error: object 'storm' not found
-```
-
-### Results
-
-There should be a section titled Results in which your results are presented.
-
-The analysis document must have at least one figure containing a plot.
-
-Your analyis must have no more than three figures. Figures may have multiple plots in them (i.e. panel plots), but there cannot be more than three figures total.

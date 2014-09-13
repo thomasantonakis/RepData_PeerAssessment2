@@ -15,11 +15,27 @@ filename <- bzfile("./data/storm_data.csv.bz2")
 if (!exists("storm")){
 storm<-read.csv(filename, stringsAsFactors = FALSE)
 }
+# close(filename)
 
 # Check the file out
 dim(storm)
 str(storm)
 summary(storm)
+
+# Fix dates Convert date and time to YEAR
+storm$BGN_DATE <- as.numeric(format(as.Date(storm$BGN_DATE, format = "%m/%d/%Y %H:%M:%S"), "%Y"))
+
+# Histogram the years for the count of records 
+hist(storm$BGN_DATE)
+
+# How many are before 1980?
+round(sum(storm$BGN_DATE<1980)/nrow(storm)*100, 2)
+
+# Decide which years to keep
+storm<-storm[storm$BGN_DATE>=1980,]
+
+# Histogram the years for the count of records 
+hist(storm$BGN_DATE)
 
 # We do not need all variables. After checking the documentation we keep the following
 file_intermediate<-data.frame("EVTYPE" = storm$EVTYPE, "FATALITIES" = storm$FATALITIES,
@@ -33,6 +49,10 @@ rm(storm)
 # Check the intermediate file out
 str(file_intermediate)
 summary(file_intermediate)
+
+# Try to clean the ENVTYPE file.
+# levels(file_intermediate$EVTYPE)
+
 
 #Check the variables connected to population health effects
 sum(file_intermediate$FATALITIES)
@@ -50,10 +70,18 @@ names(health)<-tolower(names(health))
 # We assume that one fatality weighs as much as 10 injuries in terms of health damage
 health$damage <- health$injuries + 10 * health$fatalities
 
+# Calculate sum of damages and average damage per evtype
 library(plyr)
-health_agg<-ddply(.data=health, .variables=.(evtype) , summarize, sum = sum(damage))
-head(health_agg)
-sum(health_agg$sum)
+health_sum<-ddply(.data=health, .variables=.(evtype) , summarize, sum = sum(damage))
+health_ave<-ddply(.data=health, .variables=.(evtype) , summarize, sum = mean(damage))
+names(health_sum) [2]<- c("sum_damage")
+names(health_ave) [2]<- c("avg_damage")
+health_agg<-arrange(join(health_sum, health_ave), evtype)
+head(arrange(health_agg, avg_damage, decreasing = TRUE))
+
+# Release memory
+rm(health_sum,health_ave)
+
 
 # Explore the variables connected to monetary damages.
 table(file_intermediate$PROPDMGEXP, useNA="ifany")
