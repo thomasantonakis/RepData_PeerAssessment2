@@ -77,11 +77,21 @@ health_ave<-ddply(.data=health, .variables=.(evtype) , summarize, sum = mean(dam
 names(health_sum) [2]<- c("sum_damage")
 names(health_ave) [2]<- c("avg_damage")
 health_agg<-arrange(join(health_sum, health_ave), evtype)
-head(arrange(health_agg, avg_damage, decreasing = TRUE))
+a<-head(arrange(health_agg, sum_damage, decreasing = TRUE), 10)
+a
+head(arrange(health_agg, avg_damage, decreasing = TRUE), 10)
+aplot <- a$sum_damage
+names(aplot) <- a$evtype
+par(mar = c(4, 10, 4, 1))
+barplot(aplot, col= 2, main="Top types of events in \n total health Damage index", 
+        horiz=TRUE, las=1)
+
+# We will analyze only the sums variable
+# So, let's make a bar plot of the 10 greatest theats for human health
+
 
 # Release memory
 rm(health_sum,health_ave)
-
 
 # Explore the variables connected to monetary damages.
 table(file_intermediate$PROPDMGEXP, useNA="ifany")
