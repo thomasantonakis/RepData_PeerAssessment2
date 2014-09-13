@@ -33,9 +33,11 @@ summary(storm)
 
 # Fix dates Convert date and time to YEAR
 storm$BGN_DATE <- as.numeric(format(as.Date(storm$BGN_DATE, format = "%m/%d/%Y %H:%M:%S"), "%Y"))
+quantile(storm$BGN_DATE, c(seq(from=0.1, to=1, by = 0.1)))
 
 # Histogram the years for the count of records 
-hist(storm$BGN_DATE)
+hist(storm$BGN_DATE, main = "Number of storm events per year", 
+     xlab = "Year")
 
 # How many are before 1980?
 round(sum(storm$BGN_DATE<1980)/nrow(storm)*100, 2)

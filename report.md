@@ -27,7 +27,7 @@ There should be a section titled Data Processing which describes (in words and c
 
 This project involves exploring the U.S. National Oceanic and Atmospheric Administration's (NOAA) storm database. THis database tracks characteristics of major storms and weather events in the United States, including when and where they occur, as well as estimates of any fatalities, injuries, property and crop damage.  
 The events in the database start in the year 1950 and end in November 2011. In the earlier years of the database there are generally fewer events recorded, most likely due to lack of good records. More recent years should be considered more complete.  
-The data for the  analysis cme in form of a comma-separated-value file compressed via the bzip2 algorithm to reduce its size.  
+The data for the  analysis came in form of a comma-separated-value file compressed via the bzip2 algorithm to reduce its size.  
 Let's first of all download the file.  
 
 ```r
@@ -67,7 +67,7 @@ storm<-read.csv(filename, stringsAsFactors = FALSE,
 ```
 
 This may take a couple of minutes depending on the sustem, as the csv is 47Mb big compressed and uncompressed is much much more than that: 548Mb.  
-So, hopefully, after the csv has been loaded in a dataframe named `storm` , we can check it out a little bit
+So, hopefully, after the csv has been loaded in a dataframe named `storm` , we can check it out a little bit.
 
 
 ```r
@@ -115,6 +115,70 @@ summary(storm)
 ##  3rd Qu.:   0                      3rd Qu.:  0.0                     
 ##  Max.   :5000                      Max.   :990.0
 ```
+
+The initial dataframe contains 902297 observations and 8 variables which are explained below:  
+1. BGN_DATE is for now a character variable which contains the date of the record.  
+2. EVTYPE is a character variable which contains the type of event.  
+3. FATALITIES is a numeric vector containing the number of deaths caused by a specific observation.  
+4. INJURIESis a numeric vector containing the number of injured persons caused by a specific observation.  
+5. PROPDMG is a numeric vector containing an estimate from the researcher of the economic damage caused by a specific observation in units (see next variable) on prroperties.  
+6. PROPDMGEXP is a character variable which should contain a letter, ideally one of the following "H","K","M","B". These letters should stand for Hundreds, Thousands, Millions, and Billions.  
+7. CROPDMG is a numeric vector containing an estimate from the researcher of the economic damage caused by a specific observation in units (see next variable) on crops.
+8. CROPDMGEXPis a character variable which should contain a letter, ideally one of the following "H","K","M","B". These letters should stand for Hundreds, Thousands, Millions, and Billions.  
+
+We will transform the BGN_DATE variable to the year of the record. Knowing that the records span from 1950 to 2011, days, months do not really matter.
+
+
+```r
+# Fix dates Convert date and time to YEAR
+storm$BGN_DATE <- as.numeric(format(as.Date(storm$BGN_DATE, format = "%m/%d/%Y %H:%M:%S"), "%Y"))
+```
+
+We will calculate the quantiles of the distribution of the years below.
+
+```r
+quantile(storm$BGN_DATE, c(seq(from=0.1, to=1, by = 0.1)))
+```
+
+```
+##  10%  20%  30%  40%  50%  60%  70%  80%  90% 100% 
+## 1982 1992 1996 1999 2002 2004 2006 2008 2010 2011
+```
+
+Let's make a histogram of the number of observations per year.
+
+```r
+# Histogram the years for the count of records 
+hist(storm$BGN_DATE, main = "Number of storm events per year", 
+     xlab = "Year")
+```
+
+![plot of chunk init hist for years](figure/init hist for years.png) 
+
+In the earlier years of the database there are generally fewer events recorded, most likely due to lack of good records. More recent years should be considered more complete.  We will take out of the analysis records who date earlier than 1980.  
+
+The propostion of observations before 1980 are the 8.35% of total observations, and will nw be dropped out.  
+
+
+```r
+# Decide which years to keep
+storm<-storm[storm$BGN_DATE>=1980,]
+```
+
+Having now made up our minds about the years we will use, we will create an intermediate file that will be used from now on for the anaysis. The old dataframe will be deleted for memory reasons.
+
+
+```r
+# We do not need all variables. After checking the documentation we keep the following
+file_intermediate<-data.frame("EVTYPE" = storm$EVTYPE, "FATALITIES" = storm$FATALITIES,
+                              "INJURIES" = storm$INJURIES, "PROPDMG" = storm$PROPDMG, 
+                              "PROPDMGEXP" = storm$PROPDMGEXP, "CROPDMG" = storm$CROPDMG, 
+                              "CROPDMGEXP" = storm$CROPDMGEXP)
+
+# Release memory
+rm(storm)
+```
+
 
 ### Results
 

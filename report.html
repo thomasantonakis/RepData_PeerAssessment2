@@ -199,7 +199,7 @@ hljs.initHighlightingOnLoad();
 
 <p>This project involves exploring the U.S. National Oceanic and Atmospheric Administration&#39;s (NOAA) storm database. THis database tracks characteristics of major storms and weather events in the United States, including when and where they occur, as well as estimates of any fatalities, injuries, property and crop damage.<br/>
 The events in the database start in the year 1950 and end in November 2011. In the earlier years of the database there are generally fewer events recorded, most likely due to lack of good records. More recent years should be considered more complete.<br/>
-The data for the  analysis cme in form of a comma-separated-value file compressed via the bzip2 algorithm to reduce its size.<br/>
+The data for the  analysis came in form of a comma-separated-value file compressed via the bzip2 algorithm to reduce its size.<br/>
 Let&#39;s first of all download the file.  </p>
 
 <pre><code class="r"># Create folder to put download the file
@@ -236,7 +236,7 @@ storm&lt;-read.csv(filename, stringsAsFactors = FALSE,
 </code></pre>
 
 <p>This may take a couple of minutes depending on the sustem, as the csv is 47Mb big compressed and uncompressed is much much more than that: 548Mb.<br/>
-So, hopefully, after the csv has been loaded in a dataframe named <code>storm</code> , we can check it out a little bit</p>
+So, hopefully, after the csv has been loaded in a dataframe named <code>storm</code> , we can check it out a little bit.</p>
 
 <pre><code class="r"># Check the file out
 dim(storm)
@@ -276,6 +276,60 @@ dim(storm)
 ##  Mean   :  12                      Mean   :  1.5                     
 ##  3rd Qu.:   0                      3rd Qu.:  0.0                     
 ##  Max.   :5000                      Max.   :990.0
+</code></pre>
+
+<p>The initial dataframe contains 902297 observations and 8 variables which are explained below:<br/>
+1. BGN_DATE is for now a character variable which contains the date of the record.<br/>
+2. EVTYPE is a character variable which contains the type of event.<br/>
+3. FATALITIES is a numeric vector containing the number of deaths caused by a specific observation.<br/>
+4. INJURIESis a numeric vector containing the number of injured persons caused by a specific observation.<br/>
+5. PROPDMG is a numeric vector containing an estimate from the researcher of the economic damage caused by a specific observation in units (see next variable) on prroperties.<br/>
+6. PROPDMGEXP is a character variable which should contain a letter, ideally one of the following &ldquo;H&rdquo;,&ldquo;K&rdquo;,&ldquo;M&rdquo;,&ldquo;B&rdquo;. These letters should stand for Hundreds, Thousands, Millions, and Billions.<br/>
+7. CROPDMG is a numeric vector containing an estimate from the researcher of the economic damage caused by a specific observation in units (see next variable) on crops.
+8. CROPDMGEXPis a character variable which should contain a letter, ideally one of the following &ldquo;H&rdquo;,&ldquo;K&rdquo;,&ldquo;M&rdquo;,&ldquo;B&rdquo;. These letters should stand for Hundreds, Thousands, Millions, and Billions.  </p>
+
+<p>We will transform the BGN_DATE variable to the year of the record. Knowing that the records span from 1950 to 2011, days, months do not really matter.</p>
+
+<pre><code class="r"># Fix dates Convert date and time to YEAR
+storm$BGN_DATE &lt;- as.numeric(format(as.Date(storm$BGN_DATE, format = &quot;%m/%d/%Y %H:%M:%S&quot;), &quot;%Y&quot;))
+</code></pre>
+
+<p>We will calculate the quantiles of the distribution of the years below.</p>
+
+<pre><code class="r">quantile(storm$BGN_DATE, c(seq(from=0.1, to=1, by = 0.1)))
+</code></pre>
+
+<pre><code>##  10%  20%  30%  40%  50%  60%  70%  80%  90% 100% 
+## 1982 1992 1996 1999 2002 2004 2006 2008 2010 2011
+</code></pre>
+
+<p>Let&#39;s make a histogram of the number of observations per year.</p>
+
+<pre><code class="r"># Histogram the years for the count of records 
+hist(storm$BGN_DATE, main = &quot;Number of storm events per year&quot;, 
+     xlab = &quot;Year&quot;)
+</code></pre>
+
+<p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAfgAAAH4CAMAAACR9g9NAAAAkFBMVEX9/v0AAAAAADkAAGUAOTkAOWUAOY8AZo8AZrU5AAA5ADk5AGU5OWU5OY85ZrU5j7U5j9plAABlADllAGVlOQBlOY9lZgBlZjlltbVltf2POQCPOTmPOWWPZgCPj2WPtY+P29qP2/21ZgC1tWW124+1/v3ajznatWXa/rXa/tra/v39tWX924/9/rX9/tr9/v170hVZAAAAMHRSTlP//////////////////////////////////////////////////////////////wBipdB4AAAACXBIWXMAAAsSAAALEgHS3X78AAAOfElEQVR4nO2da2OjNhpGS2Z36rSb1u50L067O413452NL/z/f7cIZBsHRBBWiKTnnA9DAryShmMJvQTwdyVI8t1HNwA+BsSLgnhREC8K4kVBvCiIFwXxoiBeFMSLgnhREC8K4kVBvCiIFwXxoiBeFMSLgnhREC8K4kVBvCiIFwXxoiBelEjFH1bFuiyPj5+eezc7N1yxvy/unq7WbNYhGheunA8kXvGfX24VvynWb6yYSKhyPpJ4xRfL2m/t+LD6/LIrvn8sPj1vi+qoVyv/XZiPRllWvzeDw93fT/3brDLBhd3FdP3ClFStWJw224h/tUotz9FrI7fatfn3XIWp9FxOU2gdctrS05y6+TtTn91S/VKYLe0GfwTRiv/0t0Z6S/wJe+xrrZv6hyvNzarFZY35FFU//q8RZjfbiP+2Si0v0cvKTxV7WFVqrqo4FbywhdY1DjVnW9netEo5xbUa/CHEK/4/98tX4j89V71sbWRUR21ZW9nf2zNCtWbRhO7vq8Nsja3tGnuAzYrz5iaiXep536bAaoWx367Cfh6aci7WbHOKdW9zFmbFeYv937X2+BjiFf+8ufvjWvzCHjEjzRzB6vjbYcCsOQ2bu/qA1h3Niq87mQ24bG4i2qU20bbAapelDWhXYVpSrz4XWp6mHFVAT3OOj5+/rRatcuvIS4UfRcTiD6vvu+LNGOkrvj4dF3YI6BXflNpEnwRVa7+t6hP0uQrbkqbgU6HlsPhye/f1fnkppQ5DvAsj3kyH6iFxXf30Wnx7qDdcjmN3qK/Z2E9Ca6jvE98awTfVzG/ZWvNK/KnQ8vVQf90cm1Set5iBZH+P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" alt="plot of chunk init hist for years"/> </p>
+
+<p>In the earlier years of the database there are generally fewer events recorded, most likely due to lack of good records. More recent years should be considered more complete.  We will take out of the analysis records who date earlier than 1980.  </p>
+
+<p>The propostion of observations before 1980 are the 8.35% of total observations, and will nw be dropped out.  </p>
+
+<pre><code class="r"># Decide which years to keep
+storm&lt;-storm[storm$BGN_DATE&gt;=1980,]
+</code></pre>
+
+<p>Having now made up our minds about the years we will use, we will create an intermediate file that will be used from now on for the anaysis. The old dataframe will be deleted for memory reasons.</p>
+
+<pre><code class="r"># We do not need all variables. After checking the documentation we keep the following
+file_intermediate&lt;-data.frame(&quot;EVTYPE&quot; = storm$EVTYPE, &quot;FATALITIES&quot; = storm$FATALITIES,
+                              &quot;INJURIES&quot; = storm$INJURIES, &quot;PROPDMG&quot; = storm$PROPDMG, 
+                              &quot;PROPDMGEXP&quot; = storm$PROPDMGEXP, &quot;CROPDMG&quot; = storm$CROPDMG, 
+                              &quot;CROPDMGEXP&quot; = storm$CROPDMGEXP)
+
+# Release memory
+rm(storm)
 </code></pre>
 
 <h3>Results</h3>

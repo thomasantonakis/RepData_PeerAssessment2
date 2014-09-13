@@ -29,7 +29,7 @@ There should be a section titled Data Processing which describes (in words and c
 
 This project involves exploring the U.S. National Oceanic and Atmospheric Administration's (NOAA) storm database. THis database tracks characteristics of major storms and weather events in the United States, including when and where they occur, as well as estimates of any fatalities, injuries, property and crop damage.  
 The events in the database start in the year 1950 and end in November 2011. In the earlier years of the database there are generally fewer events recorded, most likely due to lack of good records. More recent years should be considered more complete.  
-The data for the  analysis cme in form of a comma-separated-value file compressed via the bzip2 algorithm to reduce its size.  
+The data for the  analysis came in form of a comma-separated-value file compressed via the bzip2 algorithm to reduce its size.  
 Let's first of all download the file.  
 ``` {r download the bz2 file, cache=TRUE}
 # Create folder to put download the file
@@ -76,7 +76,57 @@ str(storm)
 summary(storm)
 ```
 
-The initial dataframe contains
+The initial dataframe contains `r dim(storm)[1]` observations and `r dim(storm)[2]` variables which are explained below:  
+1. BGN_DATE is for now a character variable which contains the date of the record.  
+2. EVTYPE is a character variable which contains the type of event.  
+3. FATALITIES is a numeric vector containing the number of deaths caused by a specific observation.  
+4. INJURIESis a numeric vector containing the number of injured persons caused by a specific observation.  
+5. PROPDMG is a numeric vector containing an estimate from the researcher of the economic damage caused by a specific observation in units (see next variable) on prroperties.  
+6. PROPDMGEXP is a character variable which should contain a letter, ideally one of the following "H","K","M","B". These letters should stand for Hundreds, Thousands, Millions, and Billions.  
+7. CROPDMG is a numeric vector containing an estimate from the researcher of the economic damage caused by a specific observation in units (see next variable) on crops.
+8. CROPDMGEXPis a character variable which should contain a letter, ideally one of the following "H","K","M","B". These letters should stand for Hundreds, Thousands, Millions, and Billions.  
+
+We will transform the BGN_DATE variable to the year of the record. Knowing that the records span from 1950 to 2011, days, months do not really matter.
+
+```{r transform into year}
+# Fix dates Convert date and time to YEAR
+storm$BGN_DATE <- as.numeric(format(as.Date(storm$BGN_DATE, format = "%m/%d/%Y %H:%M:%S"), "%Y"))
+```
+
+We will calculate the quantiles of the distribution of the years below.
+```{r quantiles}
+quantile(storm$BGN_DATE, c(seq(from=0.1, to=1, by = 0.1)))
+```
+
+Let's make a histogram of the number of observations per year.
+```{r init hist for years}
+# Histogram the years for the count of records 
+hist(storm$BGN_DATE, main = "Number of storm events per year", 
+     xlab = "Year")
+```
+
+In the earlier years of the database there are generally fewer events recorded, most likely due to lack of good records. More recent years should be considered more complete.  We will take out of the analysis records who date earlier than 1980.  
+
+The propostion of observations before 1980 are the `r round(sum(storm$BGN_DATE<1980)/nrow(storm)*100, 2)`% of total observations, and will nw be dropped out.  
+
+```{r take out old observations}
+# Decide which years to keep
+storm<-storm[storm$BGN_DATE>=1980,]
+```
+
+Having now made up our minds about the years we will use, we will create an intermediate file that will be used from now on for the anaysis. The old dataframe will be deleted for memory reasons.
+
+```{r intermediate}
+# We do not need all variables. After checking the documentation we keep the following
+file_intermediate<-data.frame("EVTYPE" = storm$EVTYPE, "FATALITIES" = storm$FATALITIES,
+                              "INJURIES" = storm$INJURIES, "PROPDMG" = storm$PROPDMG, 
+                              "PROPDMGEXP" = storm$PROPDMGEXP, "CROPDMG" = storm$CROPDMG, 
+                              "CROPDMGEXP" = storm$CROPDMGEXP)
+
+# Release memory
+rm(storm)
+```
+
 
 ### Results
 
