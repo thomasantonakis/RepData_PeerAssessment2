@@ -12,8 +12,17 @@ dateDownloaded<-date()
 filename <- bzfile("./data/storm_data.csv.bz2")
 
 # Load file in a dataframe. SOS CACHE
+# We do not need all variables. After checking the documentation we keep the following
 if (!exists("storm")){
-storm<-read.csv(filename, stringsAsFactors = FALSE)
+storm<-read.csv(filename, stringsAsFactors = FALSE, 
+                colClasses=c("NULL", NA   ,"NULL","NULL","NULL",
+                             "NULL","NULL", NA   ,"NULL","NULL",
+                             "NULL","NULL","NULL","NULL","NULL",
+                             "NULL","NULL","NULL","NULL","NULL",
+                             "NULL","NULL",NA,NA,NA,
+                             NA,NA,NA,"NULL","NULL",
+                             "NULL","NULL","NULL","NULL","NULL",
+                             "NULL","NULL"))
 }
 # close(filename)
 
@@ -80,15 +89,14 @@ health_agg<-arrange(join(health_sum, health_ave), evtype)
 a<-head(arrange(health_agg, sum_damage, decreasing = TRUE), 10)
 a
 head(arrange(health_agg, avg_damage, decreasing = TRUE), 10)
+
+# Sum will be used
+# Make a plot to illustrate greatest threats
 aplot <- a$sum_damage
 names(aplot) <- a$evtype
 par(mar = c(4, 10, 4, 1))
 barplot(aplot, col= 2, main="Top types of events in \n total health Damage index", 
         horiz=TRUE, las=1)
-
-# We will analyze only the sums variable
-# So, let's make a bar plot of the 10 greatest theats for human health
-
 
 # Release memory
 rm(health_sum,health_ave)
