@@ -51,8 +51,9 @@ names(health)<-tolower(names(health))
 health$damage <- health$injuries + 10 * health$fatalities
 
 library(plyr)
-tom<-ddply(.data=health, .variables=.(evtype) , summarize, sum = sum(damage))
-head(tom)
+health_agg<-ddply(.data=health, .variables=.(evtype) , summarize, sum = sum(damage))
+head(health_agg)
+sum(health_agg$sum)
 
 # Explore the variables connected to monetary damages.
 table(file_intermediate$PROPDMGEXP, useNA="ifany")
