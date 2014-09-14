@@ -1,4 +1,7 @@
 RepData_PeerAssessment2
 =======================
 
-Reproducible Research Peer Assessment No 2
+This is the report I created for the second assignment of [Reproducible Research](https://class.coursera.org/repdata-006) course on [Coursera.org](http://www.coursera.org/).  
+The report is also uploaded in [Rpubs.com](http://rpubs.com/astrahan7/125698)]
+
+(C) Copuright Thomas Antonakis `r date()`
