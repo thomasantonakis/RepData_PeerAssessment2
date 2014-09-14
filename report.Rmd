@@ -20,17 +20,19 @@ options(scipen = 1)
 
 ## Synopsis
 
-A data of storm events fronm 1950  up to 2011 was provided and we were asked to analyse which types of storms have the greatest effect in terms of population health and in terms of economic conseueces. For the analysis on the health of the  population, the records of fatalities and injuries were used, while for the economic consequences, data from property and crop damage estimates were assumed. The storm types with the greatest effect on population health are TORNADO, EXCESSIVE HEAT, LIGHTNING, TSTM WIND, FLASH FLOOD, and FLOOD. The storm types with the worst economic consequences are FLOOD, HURRICANE/TYPHOON, TORNADO, STORM SURGE, HAIL, and FLASH FLOOD.
+
+A data of storm events fronm 1950  up to 2011 was provided and we were asked to analyse which types of storms have had the greatest effect in terms of population health and in terms of economic consequeces. For the analysis on the health of the  population, the records of fatalities and injuries were used, while for the economic consequences, data from property and crop damage estimates were assumed. The storm types with the greatest effect on population health are TORNADO, EXCESSIVE HEAT, LIGHTNING, TSTM WIND, FLASH FLOOD, and FLOOD. The storm types with the worst economic consequences are FLOOD, HURRICANE/TYPHOON, TORNADO, STORM SURGE, HAIL, and FLASH FLOOD.
 
 ## Data Processing
 
+
 This project involves exploring the U.S. National Oceanic and Atmospheric Administration's (NOAA) storm database. THis database tracks characteristics of major storms and weather events in the United States, including when and where they occur, as well as estimates of any fatalities, injuries, property and crop damage. 
 
-The events in the database start in the year 1950 and end in November 2011. In the earlier years of the database there are generally fewer events recorded, most likely due to lack of good records. More recent years should be considered more complete. 
+The events in the database start in the year 1950 and end in November 2011. In the earlier years of the database there are generally fewer events recorded, most likely due to lack of good records. **More recent years should be considered more complete.**  
 
 The data for the  analysis came in form of a comma-separated-value file compressed via the bzip2 algorithm to reduce its size.  
 
-Let's first of all download the file.  
+Let's first of all, download the file.  
 
 ``` {r download the bz2 file, cache=TRUE}
 # Create folder to put download the file
@@ -46,7 +48,7 @@ dateDownloaded<-date()
 
 The file is now downloaded to a local folder. We now will unzip it and load it into a dataset in the R environment.  
 
-*Loading the whole dataset in R, caused knitr to stop its executionand not showing anything from this point down in the report. The loading was done in R studio , some exploration was performed and below we will only load / read the variables that seem to be related with the questions of the assignment.*  
+*Loading the whole dataset in R, caused knitr to stop its execution and not show anything from this point down in the report. The loading was done in R studio , some exploration was performed and below we will only load / read the variables that seem to be related with the questions of the assignment.*  
 
 ```{r unzip and load storm data}
 # "Unzip file" to a variable
@@ -82,8 +84,8 @@ The initial dataframe contains `r dim(storm)[1]` observations and `r dim(storm)[
 1. BGN_DATE is for now a character variable which contains the date of the record.  
 2. EVTYPE is a character variable which contains the type of event.  
 3. FATALITIES is a numeric vector containing the number of deaths caused by a specific observation.  
-4. INJURIESis a numeric vector containing the number of injured persons caused by a specific observation.  
-5. PROPDMG is a numeric vector containing an estimate from the researcher of the economic damage caused by a specific observation in units (see next variable) on prroperties.  
+4. INJURIES is a numeric vector containing the number of injured persons caused by a specific observation.  
+5. PROPDMG is a numeric vector containing an estimate from the researcher of the economic damage caused by a specific observation in units (see next variable) on properties.  
 6. PROPDMGEXP is a character variable which should contain a letter, ideally one of the following "H","K","M","B". These letters should stand for Hundreds, Thousands, Millions, and Billions.  
 7. CROPDMG is a numeric vector containing an estimate from the researcher of the economic damage caused by a specific observation in units (see next variable) on crops.
 8. CROPDMGEXP is a character variable which should contain a letter, ideally one of the following "H","K","M","B". These letters should stand for Hundreds, Thousands, Millions, and Billions.  
@@ -109,7 +111,7 @@ hist(storm$BGN_DATE, main = "Number of storm events per year",
 
 In the earlier years of the database there are generally fewer events recorded, most likely due to lack of good records. More recent years should be considered more complete.  We will take out of the analysis records who date earlier than 1980.  
 
-The proportion of observations before 1980 are the `r round(sum(storm$BGN_DATE<1980)/nrow(storm)*100, 2)`% of total observations, and will nw be dropped out.  
+The proportion of observations before 1980 are the `r round(sum(storm$BGN_DATE<1980)/nrow(storm)*100, 2)`% of total observations, and will now be dropped out.  
 
 ```{r take out old observations}
 # Decide which years to keep
@@ -139,11 +141,6 @@ summary(file_intermediate)
 
 ## Results
 
-There should be a section titled Results in which your results are presented.
-
-The analysis document must have at least one figure containing a plot.
-
-Your analyis must have no more than three figures. Figures may have multiple plots in them (i.e. panel plots), but there cannot be more than three figures total.
 
 We will first tackle the analysis on health effects of the storms. So, we will check the sums of the injuries and the fatalities of storms recorded after 1980.  
 
@@ -168,7 +165,7 @@ names(health)<-tolower(names(health))
 ```
 
 We need to discuss a bit the comparison of an injury and a fatality on the effect they have on population health. We can all understand that  a minor scratch might be recorded as an injury, as a paralysis can also be cosidered as an injury too, but a fatality means a lot more than that, but it is more specific.  
-In order to point that difference out we will multiply the effect of a fatality so that a fatality is considered 10 times more harmful as an innjury record, and we could even be quite underestimating the comparison.  
+In order to point that difference out we will multiply the effect of a fatality so that a fatality is considered 10 times more harmful as an injury record, and we could even be quite underestimating the comparison.  
 So an index of health effect will be created in order to combine the fatalities and the injuries data. 
 
 ```{r health index} 
@@ -194,9 +191,9 @@ a
 head(arrange(health_agg, avg_damage, decreasing = TRUE), 10)
 ```
 
-It turns out that the average version did not work as expected as the mean equals the sum , so these types of storm events have occured too few times.
+It turns out that the average version did not work as expected as the mean equals the sum in most cases, so these types of storm events have occured too few times.
 
-So, using the total effect we show in the following plot which tyes of storms have had the greates effects on population health.  
+So, using the total effect we show in the following plot which types of storms have had the greatest effects on population health.  
 
 ```{r barplot health}
 # Sum will be used
@@ -216,7 +213,7 @@ The most harmful in terms of population health storm types are in decreasing ord
 
 We will now tackle the analysis on the economic damage caused by storms. In out intermediate file there are four variables that are related to economic damage.
 
-5. PROPDMG is a numeric vector containing an estimate from the researcher of the economic damage caused by a specific observation in units (see next variable) on prroperties.  
+5. PROPDMG is a numeric vector containing an estimate from the researcher of the economic damage caused by a specific observation in units (see next variable) on properties.  
 6. PROPDMGEXP is a character variable which should contain a letter, ideally one of the following "H","K","M","B". These letters should stand for Hundreds, Thousands, Millions, and Billions.  
 7. CROPDMG is a numeric vector containing an estimate from the researcher of the economic damage caused by a specific observation in units (see next variable) on crops.
 8. CROPDMGEXP is a character variable which should contain a letter, ideally one of the following "H","K","M","B". These letters should stand for Hundreds, Thousands, Millions, and Billions. 
@@ -329,7 +326,7 @@ b<-head(arrange(ecodmg, damage, decreasing = TRUE), 10)
 b
 ```
 
-A plot will make us visualize which are the top types of storms in terms of economic damag across the United States.
+A plot will make us visualize which are the top types of storms in terms of economic damage across the United States.
 
 ```{r plot economic}
 # Plot of economic damage
