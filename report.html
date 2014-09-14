@@ -183,7 +183,7 @@ hljs.initHighlightingOnLoad();
 
 <h1></h1>
 
-<h3>by <em>Thomas Antonakis</em> on Sun Sep 14 13:07:18 2014</h3>
+<h3>by <em>Thomas Antonakis</em> on Sun Sep 14 13:33:54 2014</h3>
 
 <h2>Effects of Storm events on population health and economic damage</h2>
 
@@ -571,8 +571,6 @@ names(economic)&lt;-tolower(names(economic))
 rm(file_intermediate)
 </code></pre>
 
-<p>As described in the above list, apart from other characters that we will deal with later, the <code>****DMGEXP</code> variables contain mostly the letters <code>H,T,M,B</code> , which stand for Hundreds, Thousands, Millions, and Billions.  So, a transformation need to be done so as to have the actual multiplier. </p>
-
 <p>Please note that we assigned anything that did not look like &ldquo;H&rdquo;, &ldquo;K&rdquo;,&ldquo;M&rdquo;,&ldquo;B&rdquo; or an empty record to a missing values, and we plan to take those observations out. Before we do that we will calculate how many are to be taken out as a share of the total observations (after 1980)</p>
 
 <pre><code class="r"># Calculate share of missing values
@@ -592,7 +590,68 @@ economic&lt;-economic[good,]
 rm(good)
 </code></pre>
 
-<p>Lets</p>
+<p>As described in the above list, apart from other characters that we will deal with later, the <code>****DMGEXP</code> variables contain mostly the letters <code>H,T,M,B</code> , which stand for Hundreds, Thousands, Millions, and Billions.  So, a transformation need to be done so as to have the actual multiplier. </p>
+
+<pre><code class="r"># Calculate an economic damage index using the given variables
+# First the exponents must be transformed to multipliers
+economic$propdmgexpm[economic$propdmgexp==&quot;B&quot;]&lt;-9
+economic$propdmgexpm[economic$propdmgexp==&quot;M&quot;]&lt;-6
+economic$propdmgexpm[economic$propdmgexp==&quot;K&quot;]&lt;-3
+economic$propdmgexpm[economic$propdmgexp==&quot;H&quot;]&lt;-2
+economic$propdmgexpm[economic$propdmgexp==&quot;&quot;]&lt;-0
+economic$cropdmgexpm[economic$cropdmgexp==&quot;B&quot;]&lt;-9
+economic$cropdmgexpm[economic$cropdmgexp==&quot;M&quot;]&lt;-6
+economic$cropdmgexpm[economic$cropdmgexp==&quot;K&quot;]&lt;-3
+economic$cropdmgexpm[economic$cropdmgexp==&quot;H&quot;]&lt;-2
+economic$cropdmgexpm[economic$cropdmgexp==&quot;&quot;]&lt;-0
+</code></pre>
+
+<p>The values that have been assigned to each level of <code>****DMGEXP</code> is the power to which 10 must bee raised to so as to get the multiplier.<br/>
+e.g. K is transformed to 3 because 10<sup>3</sup> = 1,000 and K means Thousands.<br/>
+Now, assuming that each dollar of crop damage is equal to a dollar of property damage, we may create the <code>damage</code> variable in the <code>economic</code> dataset.</p>
+
+<pre><code class="r"># Suppose that property damage of one dollar weighs exactly as a crop damage of 
+# one dollar in the economical damage, then the economic damage index is just 
+# the sum of the crops and property product of exponents and dollar figures.
+
+economic$damage &lt;- (economic$propdmg * 10 ^economic$propdmgexpm )+ 
+        (economic$cropdmg * 10 ^ economic$cropdmgexpm)
+</code></pre>
+
+<p>We are now ready to aggregate the calculation to the storm types:</p>
+
+<pre><code class="r"># Aggregation to the storm type levels
+ecodmg&lt;-ddply(.data=economic, .variables=.(evtype) , summarize, damage = sum(damage))
+
+# Sorting by damage
+b&lt;-head(arrange(ecodmg, damage, decreasing = TRUE), 10)
+b
+</code></pre>
+
+<pre><code>##               evtype    damage
+## 1              FLOOD 1.503e+11
+## 2  HURRICANE/TYPHOON 7.191e+10
+## 3            TORNADO 4.400e+10
+## 4        STORM SURGE 4.332e+10
+## 5               HAIL 1.873e+10
+## 6        FLASH FLOOD 1.756e+10
+## 7            DROUGHT 1.502e+10
+## 8          HURRICANE 1.461e+10
+## 9        RIVER FLOOD 1.015e+10
+## 10         ICE STORM 8.967e+09
+</code></pre>
+
+<p>A plot will make us visualize which are the top types of storms in terms of economic damag across the United States.</p>
+
+<pre><code class="r"># Plot of economic damage
+bplot &lt;- b$damage
+names(bplot) &lt;- b$evtype
+par(mar = c(4, 10, 4, 1))
+barplot(bplot, col= 2, main=&quot;Top types of events in \n total economic Damage index&quot;, 
+        horiz=TRUE, las=1)
+</code></pre>
+
+<p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAfgAAAH4CAMAAACR9g9NAAAArlBMVEX9/v0AAAAAADkAAGUAOTkAOWUAOY8AZo8AZrU5AAA5ADk5AGU5OWU5OY85Zo85ZrU5j485j9plAABlADllAGVlOQBlOTllOY9lZjllZmVlZrVltbVltdpltf2POQCPOTmPOWWPZo+Pj2WPtY+P27WP29qP2/21ZgC1Zjm1tWW124+1/rW1/tq1/v3ajznaj2Xa24/a/rXa/tra/v39tWX924/9/rX9/tr9/v3/AABB1/CKAAAAOnRSTlP//////////////////////////////////////////////////////////////////////////wD/iebt9QAAAAlwSFlzAAALEgAACxIB0t1+/AAAE7pJREFUeJztnQub2sYBRS02tWG3mwTycJxWrJNNUewape4KpP7/P1bNe/TAXoQ0o+Xe87W2kEaDw2E0M6C5vKoIJK9i/wNIHCgeFIoHheJBoXhQKB4UigeF4kGheFAoHhSKB4XiQaF4UCgeFIoHBUp8uU0kyxPHs/TcGg+rZLF7dulW/cfNzf7cJxwNindkydnizzplQP3TASW+Ek309VP9V17rX4t3ws2HJFHtTr4r3mzrB0Wy9g6Ioqk805S058tTZH22WCbfVfJPvcdUJQsv/WpEi/f/BUHBFJ/phq8vAdKdEpPXrrLFzh1QRde1pcRZ1ud74k2xQjw+burrv9mjq1KFl341SvwXO5/pgBR/WNVihJ36ZZdK1SVYXIoPq9qQ9KEOyPJij75U6Er0+fbqbYuV23qvsO/tMe8HVb+rRovXRwMDKb6QLaxu3EKM2FjLY0JMuX39ebOs7IFCjQoWO9lU9SXZnm/F22KyMrHX7pFvheNGi/erUeLN0cBQfFN8lS8eV+se8bJz1kP4L4mvJX7eyIGCFV8/suL9anQfv6f4AHztUq8naM1LvUV7PnGp12UWv4s3kt3TEu9VQ/EBOT24k3vlLtk5Nwd3os9O3EXanO+7NBWZqb3Z44tPln41FB+QvumcedVrKVLPsnEgc0LdhzX6fG9qniVugL/09zi1sn6vGoqPhurKm+R68h3vQ7UgUHzvLoq/brp+c/UxHcWTK4XiQaF4UCgelOsV37zrwXt06f0P7fPVF27Dvmvv/ltCzemvVnzz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" alt="plot of chunk plot economic"/> </p>
 
 </body>
 

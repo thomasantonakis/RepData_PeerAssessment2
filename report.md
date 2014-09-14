@@ -10,7 +10,7 @@ output:
 # Reproducible Research Assignment 2
 ========================================================
 
-### by *Thomas Antonakis* on Sun Sep 14 13:07:18 2014
+### by *Thomas Antonakis* on Sun Sep 14 13:33:54 2014
 
 ## Effects of Storm events on population health and economic damage
 
@@ -450,8 +450,6 @@ names(economic)<-tolower(names(economic))
 rm(file_intermediate)
 ```
 
-As described in the above list, apart from other characters that we will deal with later, the `****DMGEXP` variables contain mostly the letters `H,T,M,B` , which stand for Hundreds, Thousands, Millions, and Billions.  So, a transformation need to be done so as to have the actual multiplier. 
-
 Please note that we assigned anything that did not look like "H", "K","M","B" or an empty record to a missing values, and we plan to take those observations out. Before we do that we will calculate how many are to be taken out as a share of the total observations (after 1980)
 
 
@@ -476,4 +474,76 @@ economic<-economic[good,]
 rm(good)
 ```
 
-Lets
+As described in the above list, apart from other characters that we will deal with later, the `****DMGEXP` variables contain mostly the letters `H,T,M,B` , which stand for Hundreds, Thousands, Millions, and Billions.  So, a transformation need to be done so as to have the actual multiplier. 
+
+
+
+```r
+# Calculate an economic damage index using the given variables
+# First the exponents must be transformed to multipliers
+economic$propdmgexpm[economic$propdmgexp=="B"]<-9
+economic$propdmgexpm[economic$propdmgexp=="M"]<-6
+economic$propdmgexpm[economic$propdmgexp=="K"]<-3
+economic$propdmgexpm[economic$propdmgexp=="H"]<-2
+economic$propdmgexpm[economic$propdmgexp==""]<-0
+economic$cropdmgexpm[economic$cropdmgexp=="B"]<-9
+economic$cropdmgexpm[economic$cropdmgexp=="M"]<-6
+economic$cropdmgexpm[economic$cropdmgexp=="K"]<-3
+economic$cropdmgexpm[economic$cropdmgexp=="H"]<-2
+economic$cropdmgexpm[economic$cropdmgexp==""]<-0
+```
+
+The values that have been assigned to each level of `****DMGEXP` is the power to which 10 must bee raised to so as to get the multiplier.  
+e.g. K is transformed to 3 because 10^3 = 1,000 and K means Thousands.  
+Now, assuming that each dollar of crop damage is equal to a dollar of property damage, we may create the `damage` variable in the `economic` dataset.
+
+
+```r
+# Suppose that property damage of one dollar weighs exactly as a crop damage of 
+# one dollar in the economical damage, then the economic damage index is just 
+# the sum of the crops and property product of exponents and dollar figures.
+
+economic$damage <- (economic$propdmg * 10 ^economic$propdmgexpm )+ 
+        (economic$cropdmg * 10 ^ economic$cropdmgexpm)
+```
+
+We are now ready to aggregate the calculation to the storm types:
+
+
+```r
+# Aggregation to the storm type levels
+ecodmg<-ddply(.data=economic, .variables=.(evtype) , summarize, damage = sum(damage))
+
+# Sorting by damage
+b<-head(arrange(ecodmg, damage, decreasing = TRUE), 10)
+b
+```
+
+```
+##               evtype    damage
+## 1              FLOOD 1.503e+11
+## 2  HURRICANE/TYPHOON 7.191e+10
+## 3            TORNADO 4.400e+10
+## 4        STORM SURGE 4.332e+10
+## 5               HAIL 1.873e+10
+## 6        FLASH FLOOD 1.756e+10
+## 7            DROUGHT 1.502e+10
+## 8          HURRICANE 1.461e+10
+## 9        RIVER FLOOD 1.015e+10
+## 10         ICE STORM 8.967e+09
+```
+
+A plot will make us visualize which are the top types of storms in terms of economic damag across the United States.
+
+
+```r
+# Plot of economic damage
+bplot <- b$damage
+names(bplot) <- b$evtype
+par(mar = c(4, 10, 4, 1))
+barplot(bplot, col= 2, main="Top types of events in \n total economic Damage index", 
+        horiz=TRUE, las=1)
+```
+
+![plot of chunk plot economic](figure/plot economic.png) 
+

@@ -147,11 +147,33 @@ summary(economic)
 
 # Calculate an economic damage index using the given variables
 # First the exponents must be transformed to multipliers
-
+economic$propdmgexpm[economic$propdmgexp=="B"]<-9
+economic$propdmgexpm[economic$propdmgexp=="M"]<-6
+economic$propdmgexpm[economic$propdmgexp=="K"]<-3
+economic$propdmgexpm[economic$propdmgexp=="H"]<-2
+economic$propdmgexpm[economic$propdmgexp==""]<-0
+economic$cropdmgexpm[economic$cropdmgexp=="B"]<-9
+economic$cropdmgexpm[economic$cropdmgexp=="M"]<-6
+economic$cropdmgexpm[economic$cropdmgexp=="K"]<-3
+economic$cropdmgexpm[economic$cropdmgexp=="H"]<-2
+economic$cropdmgexpm[economic$cropdmgexp==""]<-0
 
 # Suppose that property damage of one dollar weighs exactly as a crop damage of 
 # one dollar in the economical damage, then the economic damage index is just 
 # the sum of the crops and property product of exponents and dollar figures.
 
-economic$damage <- economic$propdmg * economic$propdmgexp + 
-        economic$cropdmg * economic$cropdmgexp
+economic$damage <- (economic$propdmg * 10 ^economic$propdmgexpm )+ 
+        (economic$cropdmg * 10 ^ economic$cropdmgexpm)
+
+# Aggregation to the storm type levels
+ecodmg<-ddply(.data=economic, .variables=.(evtype) , summarize, damage = sum(damage))
+
+# Sorting by damage
+b<-head(arrange(ecodmg, damage, decreasing = TRUE), 10)
+
+# Plot of economic damage
+bplot <- b$damage
+names(bplot) <- b$evtype
+par(mar = c(4, 10, 4, 1))
+barplot(bplot, col= 2, main="Top types of events in \n total economic Damage index", 
+        horiz=TRUE, las=1)
