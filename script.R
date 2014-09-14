@@ -107,11 +107,11 @@ table(file_intermediate$CROPDMGEXP, useNA="ifany")
 file_intermediate$PROPDMGEXP<-toupper(file_intermediate$PROPDMGEXP)
 file_intermediate$CROPDMGEXP<-toupper(file_intermediate$CROPDMGEXP)
 
-# Assign everyhing that is not empty or "K", "M", "B" to Missing value
+# Assign everyhing that is not empty or "H", K", "M", "B" to Missing value
 file_intermediate$PROPDMGEXP[!file_intermediate$PROPDMGEXP %in% 
-                                     c("", "K","M","B")]<-NA
+                                     c("", "H", "K","M","B")]<-NA
 file_intermediate$CROPDMGEXP[!file_intermediate$CROPDMGEXP %in% 
-                                     c("", "K","M","B")]<-NA
+                                     c("", "H", "K","M","B")]<-NA
 
 # Summarize new exponents
 table(file_intermediate$PROPDMGEXP, useNA="ifany")

@@ -10,25 +10,26 @@ output:
 # Reproducible Research Assignment 2
 ========================================================
 
-## *Thomas Antonakis*
+### by *Thomas Antonakis* on Sun Sep 14 13:07:18 2014
 
-### Title
-
-Your document should have a title that briefly summarizes your data analysis
+## Effects of Storm events on population health and economic damage
 
 
-### Synopsis
+## Synopsis
 
 Immediately after the title, there should be a synopsis which describes and summarizes your analysis in at most 10 complete sentences.
 
-### Data Processing
+## Data Processing
 
 There should be a section titled Data Processing which describes (in words and code) how the data were loaded into R and processed for analysis. In particular, your analysis must start from the raw CSV file containing the data. You cannot do any preprocessing outside the document. If preprocessing is time-consuming you may consider using the cache = TRUE option for certain code chunks.
 
-This project involves exploring the U.S. National Oceanic and Atmospheric Administration's (NOAA) storm database. THis database tracks characteristics of major storms and weather events in the United States, including when and where they occur, as well as estimates of any fatalities, injuries, property and crop damage.  
-The events in the database start in the year 1950 and end in November 2011. In the earlier years of the database there are generally fewer events recorded, most likely due to lack of good records. More recent years should be considered more complete.  
+This project involves exploring the U.S. National Oceanic and Atmospheric Administration's (NOAA) storm database. THis database tracks characteristics of major storms and weather events in the United States, including when and where they occur, as well as estimates of any fatalities, injuries, property and crop damage. 
+
+The events in the database start in the year 1950 and end in November 2011. In the earlier years of the database there are generally fewer events recorded, most likely due to lack of good records. More recent years should be considered more complete. 
+
 The data for the  analysis came in form of a comma-separated-value file compressed via the bzip2 algorithm to reduce its size.  
 Let's first of all download the file.  
+
 
 ```r
 # Create folder to put download the file
@@ -117,6 +118,7 @@ summary(storm)
 ```
 
 The initial dataframe contains 902297 observations and 8 variables which are explained below:  
+
 1. BGN_DATE is for now a character variable which contains the date of the record.  
 2. EVTYPE is a character variable which contains the type of event.  
 3. FATALITIES is a numeric vector containing the number of deaths caused by a specific observation.  
@@ -124,9 +126,9 @@ The initial dataframe contains 902297 observations and 8 variables which are exp
 5. PROPDMG is a numeric vector containing an estimate from the researcher of the economic damage caused by a specific observation in units (see next variable) on prroperties.  
 6. PROPDMGEXP is a character variable which should contain a letter, ideally one of the following "H","K","M","B". These letters should stand for Hundreds, Thousands, Millions, and Billions.  
 7. CROPDMG is a numeric vector containing an estimate from the researcher of the economic damage caused by a specific observation in units (see next variable) on crops.
-8. CROPDMGEXPis a character variable which should contain a letter, ideally one of the following "H","K","M","B". These letters should stand for Hundreds, Thousands, Millions, and Billions.  
+8. CROPDMGEXP is a character variable which should contain a letter, ideally one of the following "H","K","M","B". These letters should stand for Hundreds, Thousands, Millions, and Billions.  
 
-We will transform the BGN_DATE variable to the year of the record. Knowing that the records span from 1950 to 2011, days, months do not really matter.
+We will transform the BGN_DATE variable to the year of the record. Knowing that the records span from 1950 to 2011 which is a very long period of time, days, months do not really matter.
 
 
 ```r
@@ -157,7 +159,7 @@ hist(storm$BGN_DATE, main = "Number of storm events per year",
 
 In the earlier years of the database there are generally fewer events recorded, most likely due to lack of good records. More recent years should be considered more complete.  We will take out of the analysis records who date earlier than 1980.  
 
-The propostion of observations before 1980 are the 8.35% of total observations, and will nw be dropped out.  
+The proportion of observations before 1980 are the 8.35% of total observations, and will nw be dropped out.  
 
 
 ```r
@@ -221,6 +223,14 @@ summary(file_intermediate)
 ##  (Other):    84                   (Other):     9
 ```
 
+## Results
+
+There should be a section titled Results in which your results are presented.
+
+The analysis document must have at least one figure containing a plot.
+
+Your analyis must have no more than three figures. Figures may have multiple plots in them (i.e. panel plots), but there cannot be more than three figures total.
+
 We will first tackle the analysis on health effects of the storms. So, we will check the sums of the injuries and the fatalities of storms recorded after 1980.  
 
 
@@ -241,7 +251,7 @@ sum(file_intermediate$INJURIES)
 ## [1] 87153
 ```
 
-There have been 1.1786 &times; 10<sup>4</sup>deaths and 8.7153 &times; 10<sup>4</sup>  injuries from storm events from 1980 onwards.   
+There have been 11786 deaths and 87153  injuries from storm events from 1980 onwards.   
 
 Let us take a subset of the intermediate file using only the event types and the variables of injuries and fatalities.
 
@@ -325,7 +335,7 @@ head(arrange(health_agg, avg_damage, decreasing = TRUE), 10)
 
 It turns out that the average version did not work as expected as the mean equals the sum , so these types of storm events have occured too few times.
 
-So, using the total effect we shhow in the following plot which tyes of storms have had the greates effects on population health.  
+So, using the total effect we show in the following plot which tyes of storms have had the greates effects on population health.  
 
 
 ```r
@@ -345,10 +355,125 @@ barplot(aplot, col= 2, main="Top types of events in \n total health Damage index
 rm(health_sum,health_ave)
 ```
 
-### Results
+The most harmful in terms of population health storm types are in decreasing order: TORNADO, EXCESSIVE HEAT, LIGHTNING, TSTM WIND, FLASH FLOOD, FLOOD
 
-There should be a section titled Results in which your results are presented.
 
-The analysis document must have at least one figure containing a plot.
+We will now tackle the analysis on the economic damage caused by storms. In out intermediate file there are four variables that are related to economic damage.
 
-Your analyis must have no more than three figures. Figures may have multiple plots in them (i.e. panel plots), but there cannot be more than three figures total.
+5. PROPDMG is a numeric vector containing an estimate from the researcher of the economic damage caused by a specific observation in units (see next variable) on prroperties.  
+6. PROPDMGEXP is a character variable which should contain a letter, ideally one of the following "H","K","M","B". These letters should stand for Hundreds, Thousands, Millions, and Billions.  
+7. CROPDMG is a numeric vector containing an estimate from the researcher of the economic damage caused by a specific observation in units (see next variable) on crops.
+8. CROPDMGEXP is a character variable which should contain a letter, ideally one of the following "H","K","M","B". These letters should stand for Hundreds, Thousands, Millions, and Billions. 
+
+So, actually there are two sectors that we can calculate economic damage: 
+
+* Property damage
+* Crops damage
+
+The way we will calculate the damage in each sector is the following:  
+We will multiply the actual number written down by the researcher (in variable `****DMG`) with a factor that will be created through the `****DMGEXP` variables. 
+
+
+```r
+# Explore the variables connected to monetary damages.
+table(file_intermediate$PROPDMGEXP, useNA="ifany")
+```
+
+```
+## 
+##             -      ?      +      0      1      2      3      4      5 
+## 412447      1      8      5    216     25     13      4      4     28 
+##      6      7      8      B      h      H      K      m      M 
+##      4      5      1     40      1      6 404025      7  10091
+```
+
+```r
+table(file_intermediate$CROPDMGEXP, useNA="ifany")
+```
+
+```
+## 
+##             ?      0      2      B      k      K      m      M 
+## 543047      7     19      1      9     21 281832      1   1994
+```
+
+```r
+# Upper-case everything
+file_intermediate$PROPDMGEXP<-toupper(file_intermediate$PROPDMGEXP)
+file_intermediate$CROPDMGEXP<-toupper(file_intermediate$CROPDMGEXP)
+
+# Assign everyhing that is not empty or "H", K", "M", "B" to Missing value
+file_intermediate$PROPDMGEXP[!file_intermediate$PROPDMGEXP %in% 
+                                     c("", "H", "K","M","B")]<-NA
+file_intermediate$CROPDMGEXP[!file_intermediate$CROPDMGEXP %in% 
+                                     c("", "H", "K","M","B")]<-NA
+```
+
+So, after a first cleanup, let us take a look at the new `****DMGEXP`s
+
+```r
+# Summarize new exponents
+table(file_intermediate$PROPDMGEXP, useNA="ifany")
+```
+
+```
+## 
+##             B      H      K      M   <NA> 
+## 412447     40      7 404025  10098    314
+```
+
+```r
+table(file_intermediate$CROPDMGEXP, useNA="ifany")
+```
+
+```
+## 
+##             B      K      M   <NA> 
+## 543047      9 281853   1995     27
+```
+
+We bring the new variables to a new clean dataset to be used for the economic analysis:
+
+
+```r
+# Store money related variables to a separate dataframe.
+economic<-data.frame("EVTYPE" = file_intermediate$EVTYPE, 
+                   "PROPDMG" = file_intermediate$PROPDMG, 
+                   "PROPDMGEXP" = file_intermediate$PROPDMGEXP, 
+                   "CROPDMG" = file_intermediate$CROPDMG, 
+                   "CROPDMGEXP" = file_intermediate$CROPDMGEXP)
+
+# "Clean" data frame names
+names(economic)<-tolower(names(economic))
+
+# Release memory
+rm(file_intermediate)
+```
+
+As described in the above list, apart from other characters that we will deal with later, the `****DMGEXP` variables contain mostly the letters `H,T,M,B` , which stand for Hundreds, Thousands, Millions, and Billions.  So, a transformation need to be done so as to have the actual multiplier. 
+
+Please note that we assigned anything that did not look like "H", "K","M","B" or an empty record to a missing values, and we plan to take those observations out. Before we do that we will calculate how many are to be taken out as a share of the total observations (after 1980)
+
+
+```r
+# Calculate share of missing values
+good<- complete.cases(economic$propdmgexp,economic$cropdmgexp)
+round(abs(sum(good)/nrow(economic)-1)*100, 2)
+```
+
+```
+## [1] 0.04
+```
+
+The share of missing values is only 0.04% of the total, so we will indeed take them out.
+
+
+```r
+# Take Missing values out of economic dataframe
+economic<-economic[good,]
+
+# Release memory
+rm(good)
+```
+
+Lets
