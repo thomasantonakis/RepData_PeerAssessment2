@@ -10,24 +10,23 @@ output:
 # Reproducible Research Assignment 2
 ========================================================
 
-### by *Thomas Antonakis* on Sun Sep 14 13:33:54 2014
+### by *Thomas Antonakis* on Sun Sep 14 13:43:42 2014
 
 ## Effects of Storm events on population health and economic damage
 
 
 ## Synopsis
 
-Immediately after the title, there should be a synopsis which describes and summarizes your analysis in at most 10 complete sentences.
+A data of storm events fronm 1950  up to 2011 was provided and we were asked to analyse which types of storms have the greatest effect in terms of population health and in terms of economic conseueces. For the analysis on the health of the  population, the records of fatalities and injuries were used, while for the economic consequences, data from property and crop damage estimates were assumed. The storm types with the greatest effect on population health are TORNADO, EXCESSIVE HEAT, LIGHTNING, TSTM WIND, FLASH FLOOD, and FLOOD. The storm types with the worst economic consequences are 
 
 ## Data Processing
-
-There should be a section titled Data Processing which describes (in words and code) how the data were loaded into R and processed for analysis. In particular, your analysis must start from the raw CSV file containing the data. You cannot do any preprocessing outside the document. If preprocessing is time-consuming you may consider using the cache = TRUE option for certain code chunks.
 
 This project involves exploring the U.S. National Oceanic and Atmospheric Administration's (NOAA) storm database. THis database tracks characteristics of major storms and weather events in the United States, including when and where they occur, as well as estimates of any fatalities, injuries, property and crop damage. 
 
 The events in the database start in the year 1950 and end in November 2011. In the earlier years of the database there are generally fewer events recorded, most likely due to lack of good records. More recent years should be considered more complete. 
 
 The data for the  analysis came in form of a comma-separated-value file compressed via the bzip2 algorithm to reduce its size.  
+
 Let's first of all download the file.  
 
 
@@ -541,9 +540,10 @@ A plot will make us visualize which are the top types of storms in terms of econ
 bplot <- b$damage
 names(bplot) <- b$evtype
 par(mar = c(4, 10, 4, 1))
-barplot(bplot, col= 2, main="Top types of events in \n total economic Damage index", 
+barplot(bplot, col= 2, main="Top types of storms in \n Total Economic Damage index", 
         horiz=TRUE, las=1)
 ```
 
 ![plot of chunk plot economic](figure/plot economic.png) 
 
+The storm events with the worst economic consequences are FLOOD, HURRICANE/TYPHOON, TORNADO, STORM SURGE, HAIL, FLASH FLOOD
